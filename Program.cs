@@ -6,20 +6,19 @@ namespace Task2
 {
     class Program
     {
-        static void InputArr(out int[]nArr)
+        static int[] m;
+        static int[] k;
+        static void InputArr(out int[]m, out int[] k)
         {
             StreamReader nwReader = new StreamReader(@"input.txt", Encoding.Default);
             int nwLength = Convert.ToInt32(nwReader.ReadLine());
-            nArr = new int[nwLength*2 - (nwLength-1)];
-            for (int i = 0; i <= nwLength; i++)
+            m = new int[nwLength];
+            k = new int[nwLength];
+            for (int i = 0; i < nwLength; i++)
             {
                 string[] curData = nwReader.ReadLine().Split();
-                if (i == 0)
-                {
-                    nArr[i] = Convert.ToInt32(curData[0]);
-                    i++;
-                }
-                nArr[i] = Convert.ToInt32(curData[1]);
+                m[i] = Convert.ToInt32(curData[0]);
+                k[i] = Convert.ToInt32(curData[1]);
             }
             nwReader.Close();
         }
@@ -29,64 +28,18 @@ namespace Task2
             nwWriter.WriteLine(res);
             nwWriter.Close();
         }
-        static int FindPosMin(int [] arr, int startPos)
+
+        static int CountRes(int length, int startPos)
         {
-            int min = startPos;
-            for (int i = startPos; i < arr.Length; i++)
-                if (arr[i] <= arr[min])
-                    min = i;
-            return min;
-        }
-        static int[] RemoveRange(int [] arr, int startPos, int endPos)
-        {
-            int[] nArr = new int[arr.Length - (endPos - startPos + 1)];
-            for (int i = 0, j = 0; i < nArr.Length; i++, j++)
-            {
-                while (j >= startPos && j <= endPos)
-                    j++;
-                nArr[i] = arr[j];
-            }
-            return nArr;
-        }
-        static int CountRes(int [] curArr)
-        {
-            int startPos = 2;
-            int curPos = 0;
-            int result = 0;
-            while (curArr.Length > 2)
-            {
-                curPos = FindPosMin(curArr, startPos);
-                for (int i = curPos - 2; i >= 0; i--)
-                {
-                    int curResult = curArr[curPos] * curArr[i];
-                    if (i > 0)
-                    {
-                        if (curArr[i - 1] * curArr[i + 1] < curResult)
-                        {
-                            result += curArr[i - 1] * curArr[i + 1];
-                            curArr = RemoveRange(curArr, i, i);
-                        }
-                        else
-                        {
-                            result += curResult;
-                            curArr = RemoveRange(curArr, i + 1, i+1);
-                        }
-                    }
-                    else
-                    {
-                        result += curResult;
-                        curArr = RemoveRange(curArr, i + 1, i + 1);
-                    }
-                    curPos--;
-                }
-            }
-            return result;
+            if (length < 1)
+                return 0;
+            return m[startPos] * k[length + startPos] +
+                Math.Min(CountRes(length - 1, startPos), CountRes(length - 1, startPos + 1));
         }
         static void Main(string[] args)
-        {
-            int[] curArr;
-            InputArr(out curArr);
-            int result = CountRes(curArr);
+        {            
+            InputArr(out m, out k);
+            int result = CountRes(m.Length-1, 0);
             OutputRes(result);
         }
     }
