@@ -8,6 +8,7 @@ namespace Task2
     {
         static int[] m;
         static int[] k;
+        static int[,] dp;
         static void InputArr(out int[]m, out int[] k)
         {
             StreamReader nwReader = new StreamReader(@"input.txt", Encoding.Default);
@@ -29,17 +30,37 @@ namespace Task2
             nwWriter.Close();
         }
 
-        static int CountRes(int length, int startPos)
+        static int CountRes(int start, int end)
         {
-            if (length < 1)
+            if (end - start == 0)
                 return 0;
-            return m[startPos] * k[length + startPos] +
-                Math.Min(CountRes(length - 1, startPos), CountRes(length - 1, startPos + 1));
+            if (end - start == 1)
+                return m[start] * k[end];
+            if (dp[start, end] != -1)
+                return dp[start, end];
+            int dopRes = 1000000000;
+            for (int i = end-1; i >= start; i--)
+            {
+                int curRes = CountRes(start, i) + CountRes(i + 1, end);
+                if (curRes < dopRes)
+                    dopRes = curRes;
+            }
+            dp[start, end] = m[start] * k[end] + dopRes;
+            return dp[start, end];
+
+        }
+        static void CreateDP()
+        {
+            dp = new int[m.Length+1, m.Length+1];
+            for (int i = 0; i < dp.GetLength(0); i++)
+                for (int j = 0; j < dp.GetLength(1); j++)
+                    dp[i, j] = -1;
         }
         static void Main(string[] args)
         {            
             InputArr(out m, out k);
-            int result = CountRes(m.Length-1, 0);
+            CreateDP();
+            int result = CountRes(0, m.Length-1);
             OutputRes(result);
         }
     }
