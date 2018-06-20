@@ -11,23 +11,40 @@ namespace Task2
         static int[,] dp;
         static void InputArr(out int[]m, out int[] k)
         {
-            StreamReader nwReader = new StreamReader(@"input.txt", Encoding.Default);
-            int nwLength = Convert.ToInt32(nwReader.ReadLine());
-            m = new int[nwLength];
-            k = new int[nwLength];
-            for (int i = 0; i < nwLength; i++)
+            try
             {
-                string[] curData = nwReader.ReadLine().Split();
-                m[i] = Convert.ToInt32(curData[0]);
-                k[i] = Convert.ToInt32(curData[1]);
+                StreamReader nwReader = new StreamReader(@"input.txt", Encoding.Default);
+                int nwLength = Convert.ToInt32(nwReader.ReadLine());
+                m = new int[nwLength];
+                k = new int[nwLength];
+                for (int i = 0; i < nwLength; i++)
+                {
+                    string[] curData = nwReader.ReadLine().Split();
+                    m[i] = Convert.ToInt32(curData[0]);
+                    k[i] = Convert.ToInt32(curData[1]);
+                }
+                nwReader.Close();
             }
-            nwReader.Close();
+            catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                m = k = null;
+                return;
+            }
+            
         }
         static void OutputRes(int res)
         {
-            StreamWriter nwWriter = new StreamWriter(@"output.txt", false, Encoding.Default);
-            nwWriter.WriteLine(res);
-            nwWriter.Close();
+            try
+            {
+                StreamWriter nwWriter = new StreamWriter(@"output.txt", false, Encoding.Default);
+                nwWriter.WriteLine(res);
+                nwWriter.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
         }
 
         static int CountRes(int start, int end)
@@ -38,7 +55,7 @@ namespace Task2
                 return m[start] * k[end];
             if (dp[start, end] != -1)
                 return dp[start, end];
-            int dopRes = 1000000000;
+            int dopRes = (int)1e9;
             for (int i = end-1; i >= start; i--)
             {
                 int curRes = CountRes(start, i) + CountRes(i + 1, end);
@@ -59,6 +76,8 @@ namespace Task2
         static void Main(string[] args)
         {            
             InputArr(out m, out k);
+            if (m == null || k == null || m.Length == 0 || k.Length == 0)
+                return;
             CreateDP();
             int result = CountRes(0, m.Length-1);
             OutputRes(result);
